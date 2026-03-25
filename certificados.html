@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Certificados — Venery Gutiery</title>
+  <meta name="description" content="103 certificados Alura — Venery Gutiery, Software Engineer." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0c0c0e; --surface: #111114; --border: #1e1e24;
+      --text: #e2e2e8; --muted: #6b6b7a; --accent: #c8f04a;
+      --mono: 'DM Mono', monospace; --serif: 'DM Serif Display', serif; --sans: 'DM Sans', sans-serif;
+    }
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--text); font-family: var(--sans); font-size: 15px; line-height: 1.7; -webkit-font-smoothing: antialiased; }
+
+    nav { display: flex; align-items: center; justify-content: space-between; padding: 20px 48px; border-bottom: 1px solid var(--border); }
+    .nav-logo { font-family: var(--mono); font-size: 13px; color: var(--accent); text-decoration: none; }
+    .nav-back { font-family: var(--mono); font-size: 12px; color: var(--muted); text-decoration: none; letter-spacing: 0.06em; transition: color 0.2s; }
+    .nav-back:hover { color: var(--text); }
+
+    .page-header { max-width: 1100px; margin: 0 auto; padding: 72px 48px 48px; border-bottom: 1px solid var(--border); }
+    .page-label { font-family: var(--mono); font-size: 11px; color: var(--accent); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 16px; }
+    h1 { font-family: var(--serif); font-size: clamp(36px, 5vw, 64px); font-weight: 400; line-height: 1.1; margin-bottom: 16px; }
+    h1 em { font-style: italic; color: var(--muted); }
+    .page-sub { color: var(--muted); font-size: 15px; max-width: 580px; }
+
+    .stats-bar { max-width: 1100px; margin: 0 auto; padding: 32px 48px; display: flex; gap: 48px; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+    .stat { display: flex; flex-direction: column; gap: 4px; }
+    .stat-num { font-family: var(--serif); font-size: 36px; color: var(--accent); line-height: 1; }
+    .stat-label { font-family: var(--mono); font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; }
+
+    .controls { max-width: 1100px; margin: 0 auto; padding: 24px 48px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; border-bottom: 1px solid var(--border); }
+    .filter-btn { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; padding: 6px 14px; border-radius: 2px; border: 1px solid var(--border); background: transparent; color: var(--muted); cursor: pointer; transition: all 0.15s; }
+    .filter-btn:hover, .filter-btn.active { background: var(--accent); border-color: var(--accent); color: #0c0c0e; }
+    .search-wrap { margin-left: auto; }
+    .search-input { font-family: var(--mono); font-size: 12px; background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 7px 14px; border-radius: 2px; outline: none; width: 260px; transition: border-color 0.2s; }
+    .search-input::placeholder { color: var(--muted); }
+    .search-input:focus { border-color: var(--accent); }
+
+    .certs-section { max-width: 1100px; margin: 0 auto; padding: 40px 48px 80px; }
+    .category-block { margin-bottom: 52px; }
+    .category-title { font-family: var(--mono); font-size: 11px; color: var(--accent); text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 14px; display: flex; align-items: center; gap: 12px; }
+    .category-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+    .certs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 2px; }
+
+    .cert-card { background: var(--surface); padding: 18px 20px; display: flex; flex-direction: column; gap: 8px; transition: background 0.15s; position: relative; overflow: hidden; }
+    .cert-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 2px; background: var(--accent); transform: scaleY(0); transition: transform 0.25s ease; transform-origin: bottom; }
+    .cert-card:hover { background: #141418; }
+    .cert-card:hover::before { transform: scaleY(1); }
+    .cert-card.hidden { display: none; }
+
+    .cert-name { font-size: 13px; font-weight: 500; color: var(--text); line-height: 1.45; }
+    .cert-meta { display: flex; align-items: center; justify-content: space-between; }
+    .cert-platform { font-family: var(--mono); font-size: 10px; color: var(--muted); }
+    .cert-link { font-family: var(--mono); font-size: 10px; color: var(--muted); text-decoration: none; text-transform: uppercase; letter-spacing: 0.08em; transition: color 0.2s; align-self: flex-start; }
+    .cert-link:hover { color: var(--accent); }
+
+    .no-results { font-family: var(--mono); font-size: 13px; color: var(--muted); padding: 48px 0; display: none; }
+    .category-block.all-hidden { display: none; }
+
+    footer { border-top: 1px solid var(--border); padding: 28px 48px; max-width: 1100px; margin: 0 auto; display: flex; justify-content: space-between; }
+    .footer-note { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+
+    @media (max-width: 768px) {
+      nav, .page-header, .stats-bar, .controls, .certs-section, footer { padding-left: 24px; padding-right: 24px; }
+      .search-wrap { margin-left: 0; width: 100%; }
+      .search-input { width: 100%; }
+      .stats-bar { gap: 24px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">VG.dev</a>
+  <a href="index.html" class="nav-back">← Portfolio</a>
+</nav>
+
+<div class="page-header">
+  <p class="page-label">Alura — Formacao Continua</p>
+  <h1>103 cursos.<br><em>Todos concluidos.</em></h1>
+  <p class="page-sub">Certificados obtidos na plataforma Alura, cobrindo backend, mobile, frontend, dados, devops, seguranca, design e game dev.</p>
+</div>
+
+<div class="stats-bar">
+  <div class="stat"><span class="stat-num">103</span><span class="stat-label">Certificados</span></div>
+  <div class="stat"><span class="stat-num" id="visible-count">103</span><span class="stat-label">Visiveis</span></div>
+  <div class="stat"><span class="stat-num">9</span><span class="stat-label">Areas</span></div>
+  <div class="stat"><span class="stat-num">2025</span><span class="stat-label">Ultimo</span></div>
+</div>
+
+<div class="controls">
+  <button class="filter-btn active" data-filter="all">Todos</button>
+  <button class="filter-btn" data-filter="java">Java</button>
+  <button class="filter-btn" data-filter="mobile">Mobile</button>
+  <button class="filter-btn" data-filter="frontend">Frontend</button>
+  <button class="filter-btn" data-filter="dados">Dados</button>
+  <button class="filter-btn" data-filter="devops">DevOps</button>
+  <button class="filter-btn" data-filter="seguranca">Seguranca</button>
+  <button class="filter-btn" data-filter="design">Design</button>
+  <button class="filter-btn" data-filter="gamedev">Game Dev</button>
+  <button class="filter-btn" data-filter="outros">Outros</button>
+  <div class="search-wrap">
+    <input class="search-input" type="text" placeholder="Buscar certificado..." id="search" autocomplete="off" />
+  </div>
+</div>
+
+<div class="certs-section">
+  <p class="no-results" id="no-results">Nenhum certificado encontrado.</p>
+
+  <!-- JAVA / BACKEND -->
+  <div class="category-block" id="cat-java">
+    <div class="category-title">Java &amp; Backend</div>
+    <div class="certs-grid" id="grid-java"></div>
+  </div>
+
+  <!-- MOBILE -->
+  <div class="category-block" id="cat-mobile">
+    <div class="category-title">Mobile — Flutter &amp; Firebase</div>
+    <div class="certs-grid" id="grid-mobile"></div>
+  </div>
+
+  <!-- FRONTEND -->
+  <div class="category-block" id="cat-frontend">
+    <div class="category-title">Frontend — HTML, CSS, React &amp; Acessibilidade</div>
+    <div class="certs-grid" id="grid-frontend"></div>
+  </div>
+
+  <!-- DADOS -->
+  <div class="category-block" id="cat-dados">
+    <div class="category-title">Dados — MySQL, PostgreSQL &amp; Power BI</div>
+    <div class="certs-grid" id="grid-dados"></div>
+  </div>
+
+  <!-- DEVOPS -->
+  <div class="category-block" id="cat-devops">
+    <div class="category-title">DevOps &amp; Ferramentas</div>
+    <div class="certs-grid" id="grid-devops"></div>
+  </div>
+
+  <!-- SEGURANCA -->
+  <div class="category-block" id="cat-seguranca">
+    <div class="category-title">Seguranca</div>
+    <div class="certs-grid" id="grid-seguranca"></div>
+  </div>
+
+  <!-- DESIGN -->
+  <div class="category-block" id="cat-design">
+    <div class="category-title">Design — Figma</div>
+    <div class="certs-grid" id="grid-design"></div>
+  </div>
+
+  <!-- GAMEDEV -->
+  <div class="category-block" id="cat-gamedev">
+    <div class="category-title">Game Dev &amp; Unity</div>
+    <div class="certs-grid" id="grid-gamedev"></div>
+  </div>
+
+  <!-- OUTROS -->
+  <div class="category-block" id="cat-outros">
+    <div class="category-title">Outros</div>
+    <div class="certs-grid" id="grid-outros"></div>
+  </div>
+</div>
+
+<footer>
+  <span class="footer-note">Venery Gutiery — Cascavel, BR</span>
+  <span class="footer-note">103 certificados Alura</span>
+</footer>
+
+<script>
+const PROFILE = "https://cursos.alura.com.br/user/veneryportorufino";
+
+const certs = [
+  // ── JAVA / BACKEND ──────────────────────────────────────
+  { name: "Java: criando a sua primeira aplicacao", cat: "java" },
+  { name: "Java: aplicando a Orientacao a Objetos", cat: "java" },
+  { name: "Java: trabalhando com listas e colecoes de dados", cat: "java" },
+  { name: "Java: consumindo API, gravando arquivos e lidando com erros", cat: "java" },
+  { name: "Java: trabalhando com lambdas, streams e Spring Framework", cat: "java" },
+  { name: "Java: persistencia de dados e consultas com Spring Data JPA", cat: "java" },
+  { name: "Java: criando sua primeira API e conectando ao front", cat: "java" },
+  { name: "Seguranca web em Java: evitando SQL Injection, forca bruta e outros ataques", cat: "java" },
+  { name: "Seguranca web em Java parte 2: XSS, Mass Assignment e Uploads de arquivos", cat: "java" },
+  { name: ".NET 6: criando uma web API", cat: "java" },
+  { name: "Node.js: continue seu projeto full stack criando uma API com Express", cat: "java" },
+  { name: "Next.JS: full stack com lambdas", cat: "java" },
+  { name: "React e Node.js: consumindo APIs no React no projeto full stack", cat: "java" },
+  { name: "React: comece seu projeto full stack", cat: "java" },
+  { name: "Python: aplicando boas praticas com PEP 8", cat: "java" },
+  { name: "Python e TDD: explorando testes unitarios", cat: "java" },
+  { name: "Python: construindo sistemas eficientes com SOLID e Design Patterns", cat: "java" },
+
+  // ── MOBILE ───────────────────────────────────────────────
+  { name: "Do Dart ao Flutter: criando seu primeiro aplicativo", cat: "mobile" },
+  { name: "Dart: trabalhando com a sintaxe e configuracao de projeto", cat: "mobile" },
+  { name: "Dart: trabalhando com orientacao a objetos", cat: "mobile" },
+  { name: "Dart: entendendo a Orientacao a Objetos", cat: "mobile" },
+  { name: "Dart: entendendo assincronismo", cat: "mobile" },
+  { name: "Dart: dominando assincronismo e criando comunicacao com APIs", cat: "mobile" },
+  { name: "Dart: lidando com erros, excecoes e null safety", cat: "mobile" },
+  { name: "Dart: lidando com Exceptions e Null Safety", cat: "mobile" },
+  { name: "Praticando Collections no Dart: listas, sets e mapas", cat: "mobile" },
+  { name: "Flutter: Widgets, Stateless, Stateful, Imagens e Animacoes", cat: "mobile" },
+  { name: "Flutter: estilizando e reproduzindo layouts", cat: "mobile" },
+  { name: "Flutter: Controller, navegacao e estados", cat: "mobile" },
+  { name: "Flutter: gerenciamento de estados com Provider", cat: "mobile" },
+  { name: "Flutter: aplicando constraints e implementando layouts responsivos", cat: "mobile" },
+  { name: "Flutter com animacoes: personalize seu app com animacoes implicitas", cat: "mobile" },
+  { name: "Flutter: aplicando persistencia de dados", cat: "mobile" },
+  { name: "Flutter: aplicando testes de unidade, de Widget e Mocks", cat: "mobile" },
+  { name: "Flutter: implementando testes de integracao", cat: "mobile" },
+  { name: "Flutter: melhore a qualidade do app com design patterns", cat: "mobile" },
+  { name: "Flutter com WebAPI: integrando sua aplicacao", cat: "mobile" },
+  { name: "Flutter com Web API: evoluindo na integracao da aplicacao", cat: "mobile" },
+  { name: "Flutter e Supabase: criando um app com BaaS", cat: "mobile" },
+  { name: "Flutter com Firebase: autenticando usuarios com Authentication", cat: "mobile" },
+  { name: "Flutter com Firebase: evoluindo a aplicacao com o Cloud Firestore", cat: "mobile" },
+  { name: "Flutter com Firebase: guardando arquivos na nuvem com Storage", cat: "mobile" },
+  { name: "Flutter com Firebase: implementando banco de dados online com Cloud Firestore", cat: "mobile" },
+  { name: "Firebase Authentication: integracao com apps Android", cat: "mobile" },
+  { name: "Firebase com Android: salve os dados NoSQL no Firestore", cat: "mobile" },
+  { name: "Firebase com Android: armazene imagens com o Cloud Storage", cat: "mobile" },
+  { name: "Firebase com Android: Push Notification no Cloud Messaging", cat: "mobile" },
+
+  // ── FRONTEND ─────────────────────────────────────────────
+  { name: "HTML e CSS: ambientes de desenvolvimento, estrutura de arquivos e tags", cat: "frontend" },
+  { name: "HTML e CSS: Classes, posicionamento e Flexbox", cat: "frontend" },
+  { name: "HTML e CSS: cabecalho, footer e variaveis CSS", cat: "frontend" },
+  { name: "HTML e CSS: responsividade com mobile-first", cat: "frontend" },
+  { name: "HTML e CSS: trabalhando com responsividade e publicacao de projetos", cat: "frontend" },
+  { name: "HTML e CSS: praticando HTML/CSS", cat: "frontend" },
+  { name: "CSS: Flexbox e layouts responsivos", cat: "frontend" },
+  { name: "CSS: ajustando a acessibilidade visual em um projeto", cat: "frontend" },
+  { name: "Acessibilidade no HTML: escrevendo codigos semanticos para inclusao", cat: "frontend" },
+  { name: "Acessibilidade em HTML, CSS e JavaScript: avaliando e melhorando um projeto com o NVDA", cat: "frontend" },
+  { name: "Acessibilidade Web: manipulando WAI-ARIA e elementos interativos com Javascript", cat: "frontend" },
+  { name: "Logica de programacao: mergulhe em programacao com JavaScript", cat: "frontend" },
+  { name: "Logica de programacao: explore funcoes e listas", cat: "frontend" },
+  { name: "Logica de programacao: praticando com desafios", cat: "frontend" },
+
+  // ── DADOS ────────────────────────────────────────────────
+  { name: "MySQL: conhecendo a ferramenta", cat: "dados" },
+  { name: "MySQL: executando Procedures", cat: "dados" },
+  { name: "MySQL: trabalhando com funcoes", cat: "dados" },
+  { name: "MySQL: aplicado para analise de dados", cat: "dados" },
+  { name: "MySQL Administrator: criando indices e manipulando dados", cat: "dados" },
+  { name: "MySQL Administrator: configurando e monitorando o servidor", cat: "dados" },
+  { name: "MySQL Administrator: backups e replicacao de banco de dados", cat: "dados" },
+  { name: "MySQL Administrator: gerenciando esquemas e usuarios", cat: "dados" },
+  { name: "PostgreSQL", cat: "dados" },
+  { name: "Power BI Desktop: construindo meu primeiro dashboard", cat: "dados" },
+  { name: "Power BI Desktop: realizando ETL no Power Query", cat: "dados" },
+  { name: "Power BI: construindo calculos com Dax", cat: "dados" },
+  { name: "Power BI: visualizando e analisando dados", cat: "dados" },
+
+  // ── DEVOPS & FERRAMENTAS ──────────────────────────────────
+  { name: "Git e GitHub: dominando controle de versao de codigo", cat: "devops" },
+  { name: "Git e GitHub: compartilhando e colaborando em projetos", cat: "devops" },
+  { name: "Terminal: aprenda comandos para executar tarefas", cat: "devops" },
+  { name: "Windows Prompt: utilizando o CMD", cat: "devops" },
+  { name: "PowerShell parte 1: a linguagem de scripting moderna", cat: "devops" },
+  { name: "PowerShell parte 2: Sessoes, Jobs e Administracao Remota", cat: "devops" },
+  { name: "Automacao com UiPath: Extracao de Dados, IA e Automacao de Processos", cat: "devops" },
+  { name: "VSCode: aprendendo dicas e truques", cat: "devops" },
+
+  // ── SEGURANCA ────────────────────────────────────────────
+  { name: "Pentest: explorando vulnerabilidades em aplicacoes web", cat: "seguranca" },
+  { name: "Seguranca de rede: firewall, WAF e SIEM", cat: "seguranca" },
+  { name: "Seguranca de rede: proxy reverso, SSH e DNS", cat: "seguranca" },
+  { name: "Modelagem de ameacas: identifique riscos na concepcao do software", cat: "seguranca" },
+
+  // ── DESIGN ───────────────────────────────────────────────
+  { name: "Figma: conhecendo a ferramenta", cat: "design" },
+  { name: "Figma: criando e evoluindo componentes de uma interface", cat: "design" },
+  { name: "Figma: criando prototipos interativos", cat: "design" },
+  { name: "Figma AI: integrando inteligencia artificial no design de interfaces", cat: "design" },
+  { name: "Masterclass Figma: do zero a criacao de uma Landing Page", cat: "design" },
+  { name: "Praticando Figma: auto layout", cat: "design" },
+  { name: "Praticando Figma: componentes", cat: "design" },
+  { name: "Praticando Figma: Design System", cat: "design" },
+  { name: "Praticando Figma: prototipacao", cat: "design" },
+  { name: "Practicando Figma: Handoff", cat: "design" },
+
+  // ── GAME DEV ─────────────────────────────────────────────
+  { name: "Unity: criando menus, coletaveis e batalha final em um jogo 2D", cat: "gamedev" },
+  { name: "Unity: criando um jogo metroidvania 2D", cat: "gamedev" },
+  { name: "Game Design: definindo os principios de um jogo digital", cat: "gamedev" },
+  { name: "Game Design: entenda estrategias para viabilizar e monetizar o seu jogo", cat: "gamedev" },
+  { name: "Game design: refinando aspectos visuais e artisticos do jogo", cat: "gamedev" },
+  { name: "Game Design: viabilizando o jogo como produto", cat: "gamedev" },
+
+  // ── OUTROS ───────────────────────────────────────────────
+  { name: "Comecando em Programacao: carreira e primeiros passos", cat: "outros" },
+];
+
+// Build cards
+const catMap = {
+  java: "grid-java", mobile: "grid-mobile", frontend: "grid-frontend",
+  dados: "grid-dados", devops: "grid-devops", seguranca: "grid-seguranca",
+  design: "grid-design", gamedev: "grid-gamedev", outros: "grid-outros"
+};
+
+certs.forEach(cert => {
+  const grid = document.getElementById(catMap[cert.cat]);
+  if (!grid) return;
+  const card = document.createElement("div");
+  card.className = "cert-card";
+  card.dataset.cat = cert.cat;
+  card.dataset.name = cert.name.toLowerCase();
+  card.innerHTML = `
+    <span class="cert-name">${cert.name}</span>
+    <div class="cert-meta">
+      <span class="cert-platform">Alura</span>
+    </div>
+    <a href="${PROFILE}" target="_blank" class="cert-link">Ver certificado →</a>
+  `;
+  grid.appendChild(card);
+});
+
+// Filter + search
+let activeFilter = "all";
+
+function update() {
+  const query = document.getElementById("search").value.toLowerCase().trim();
+  let visible = 0;
+
+  document.querySelectorAll(".cert-card").forEach(card => {
+    const matchCat = activeFilter === "all" || card.dataset.cat === activeFilter;
+    const matchSearch = !query || card.dataset.name.includes(query);
+    const show = matchCat && matchSearch;
+    card.classList.toggle("hidden", !show);
+    if (show) visible++;
+  });
+
+  // hide empty categories
+  Object.keys(catMap).forEach(cat => {
+    const block = document.getElementById("cat-" + cat);
+    const hasVisible = block.querySelectorAll(".cert-card:not(.hidden)").length > 0;
+    block.classList.toggle("all-hidden", !hasVisible);
+  });
+
+  document.getElementById("visible-count").textContent = visible;
+  document.getElementById("no-results").style.display = visible === 0 ? "block" : "none";
+}
+
+document.querySelectorAll(".filter-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    activeFilter = btn.dataset.filter;
+    update();
+  });
+});
+
+document.getElementById("search").addEventListener("input", update);
+
+// Reveal on scroll
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.style.opacity = "1"; });
+}, { threshold: 0.05 });
+document.querySelectorAll(".category-block").forEach(el => {
+  el.style.opacity = "0";
+  el.style.transition = "opacity 0.5s ease";
+  observer.observe(el);
+});
+</script>
+</body>
+</html>
